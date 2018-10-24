@@ -169,7 +169,10 @@ namespace WeblogAddin
         /// </summary>
         public IDictionary<string,CustomField> CustomFields { get; set;} = new Dictionary<string, CustomField>();
 
-	   
+        /// <summary>
+        /// Mapping img file to uploaded media object from NewMediaObject() result
+        /// </summary>
+        public Dictionary<string, MediaObjectInfo> MediaObjects { get; set; }
 
 		/// <summary>
 		/// This should hold the sanitized markdown text
@@ -275,6 +278,9 @@ namespace WeblogAddin
             
             if (meta.CustomFields != null)
                 post.CustomFields = meta.CustomFields.Values.ToArray();
+
+            post.MediaObjects = meta.MediaObjects;
+
 
             return meta;
         }

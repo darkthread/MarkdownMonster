@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -73,7 +74,9 @@ namespace WebLogAddin.MetaWebLogApi
             string body = post.Body;            
             try
             {
-                body = SendImages(body, basePath, wrapper);
+                post.MediaObjects = WeblogAddinConfiguration.Current.StoreMediaObjectInfo
+                    ? (post.MediaObjects ?? new Dictionary<string, MediaObjectInfo>()) : null; 
+                body = SendImages(body, basePath, wrapper, post.MediaObjects);
             }
             catch (Exception ex)
             {
@@ -214,9 +217,10 @@ namespace WebLogAddin.MetaWebLogApi
         /// <param name="basePath">image file name</param>
         /// <param name="wrapper">blog wrapper instance that sends</param>
         /// <param name="metaData">metadata containing post info</param>
+        /// <param name="imgFileMapping">mapping of filename with hash to NewMediaObject</param>
         /// <returns>update HTML string for the document with updated images</returns>
         private string SendImages(string html, string basePath,
-                                  MetaWeblogWrapper wrapper)
+                                  MetaWeblogWrapper wrapper, Dictionary<string, MediaObjectInfo> imgFileMapping)
         {
 
             // base folder name for uploads - just the folder name of the image
@@ -255,7 +259,21 @@ namespace WebLogAddin.MetaWebLogApi
                                     Name = baseName + "/" + uploadFilename
                                 };
 
-                                var mediaResult = wrapper.NewMediaObject(media);
+                                //use file name with hash to check if file is already uploaded
+                                var imgFileChk = origImageLink + "#" + Convert.ToBase64String(MD5.Create().ComputeHash(media.Bits));
+                                MediaObjectInfo mediaResult = null;
+                                if (imgFileMapping != null && imgFileMapping.ContainsKey(imgFileChk))
+                                {
+                                    //Image has already uploaded
+                                    mediaResult = imgFileMapping[imgFileChk];
+                                }
+                                else
+                                {
+                                    mediaResult = wrapper.NewMediaObject(media);
+                                    if (imgFileMapping != null)
+                                        imgFileMapping.Add(imgFileChk, mediaResult);
+                                }
+
                                 img.Attributes["src"].Value = mediaResult.URL;
 
                                 // use first image as featured image

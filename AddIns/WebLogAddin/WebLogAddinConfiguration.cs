@@ -141,6 +141,22 @@ Tags:
             }
         }
         private bool _replacePostImagesWithOnlineUrls;
+		
+		
+		/// <summary>
+        /// Store information of the images uploaded via MetaWebloApi NewMediaOjbect() to prevent duplicated upload
+        /// </summary>
+        public bool StoreMediaObjectInfo
+        {
+            get { return _storeMediaObjectInfo; }
+            set
+            {
+                if (value == _storeMediaObjectInfo) return;
+                _storeMediaObjectInfo = value;
+                OnPropertyChanged(nameof(StoreMediaObjectInfo));
+            }
+        }
+        private bool _storeMediaObjectInfo;
 
 
 

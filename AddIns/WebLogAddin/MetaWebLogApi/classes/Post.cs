@@ -17,6 +17,13 @@ namespace WebLogAddin.MetaWebLogApi
 
         public DateTime DateCreated { get; set; }
         public string Body { get; set; }
+
+        /// <summary>
+        /// Mapping img file to uploaded media object from NewMediaObject() result
+        /// </summary>
+        public Dictionary<string, MediaObjectInfo> MediaObjects { get; set; } =
+            WeblogAddin.WeblogAddinConfiguration.Current.StoreMediaObjectInfo ? new Dictionary<string, MediaObjectInfo>() : null;
+
         public string Title { get; set; }
         public string Permalink { get; set; }
         public string[] Categories { get; set; }

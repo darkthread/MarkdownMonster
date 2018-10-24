@@ -267,6 +267,9 @@ namespace WeblogAddin
             
             meta.PostId = WeblogModel.ActivePost.PostId?.ToString();
 
+            if (WeblogAddinConfiguration.Current.StoreMediaObjectInfo)
+                meta.MediaObjects = WeblogModel.ActivePost.MediaObjects;
+
             // retrieve the raw editor markdown
             markdown = editor.MarkdownDocument.CurrentText;
             meta.RawMarkdownBody = markdown;
